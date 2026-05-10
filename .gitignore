@@ -15,6 +15,9 @@ snapshot.json
 tuya-raw.json
 config/
 
+# Local scratch / test scripts
+testing_*.py
+
 # Python bytecode & packaging artifacts
 __pycache__/
 *.pyc
