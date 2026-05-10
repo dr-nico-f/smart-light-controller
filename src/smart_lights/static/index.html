@@ -210,6 +210,14 @@ section { margin-bottom: 40px; }
   box-shadow: 0 2px 12px var(--strip-colour, transparent);
 }
 
+.device-card.off {
+  opacity: 0.5;
+}
+
+.device-card.off .colour-strip {
+  opacity: 0.2;
+}
+
 .device-card::before {
   content: '';
   position: absolute;
@@ -574,8 +582,13 @@ kbd {
 
 .scene-btn:active {
   transform: translateY(0);
+}
+
+.scene-btn.active {
   background: var(--accent);
+  border-color: var(--accent);
   color: white;
+  box-shadow: 0 4px 20px var(--accent-glow);
 }
 
 /* Transitions Panel */
@@ -995,6 +1008,8 @@ function renderFadeTargets() {
 }
 
 async function toggleDevice(slug, on) {
+  const card = document.querySelector(`.device-card[data-slug="${slug}"]`);
+  if (card) card.classList.toggle('off', !on);
   try {
     await api('POST', `/devices/${slug}/${on ? 'on' : 'off'}`);
     toast(`${slug} ${on ? 'on' : 'off'}`);
@@ -1077,11 +1092,43 @@ async function loadScenes() {
   const scenes = await api('GET', '/scenes');
   const grid = document.getElementById('scenesGrid');
   grid.innerHTML = scenes.map(s =>
-    `<button class="scene-btn" onclick="applyScene('${s}')">${s}</button>`
+    `<button class="scene-btn" onclick="applyScene('${s}', this)">${s}</button>`
   ).join('');
 }
 
-async function applyScene(name) {
+const SCENE_THEMES = {
+  'all-off':    { colour: null, power: false },
+  'movie-time': { colour: '#e67e22' },
+  'reading':    { colour: '#f5e6c8' },
+  'party':      { colour: '#9b59b6' },
+  'focus':      { colour: '#5dade2' },
+  'goodnight':  { colour: '#e74c3c' },
+};
+
+async function applyScene(name, btn) {
+  document.querySelectorAll('.scene-btn.active').forEach(el => el.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const theme = SCENE_THEMES[name];
+  document.querySelectorAll('.device-card').forEach(card => {
+    const toggle = card.querySelector('.toggle input');
+    const strip = card.querySelector('.colour-strip');
+    if (theme && theme.power === false) {
+      card.classList.add('off');
+      if (toggle) toggle.checked = false;
+      strip.style.background = 'transparent';
+      strip.classList.remove('active');
+    } else {
+      card.classList.remove('off');
+      if (toggle) toggle.checked = true;
+      if (theme && theme.colour) {
+        strip.style.background = theme.colour;
+        strip.style.setProperty('--strip-colour', theme.colour + '80');
+        strip.classList.add('active');
+      }
+    }
+  });
+
   try {
     await api('POST', `/scenes/${name}`);
     toast(`Scene: ${name}`);
@@ -1128,10 +1175,14 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Escape') {
-    devices.forEach(d => {
-      const card = document.querySelector(`[data-slug="${d.slug}"] .toggle input`);
-      if (card) card.checked = false;
+    document.querySelectorAll('.device-card').forEach(card => {
+      card.classList.add('off');
+      const toggle = card.querySelector('.toggle input');
+      if (toggle) toggle.checked = false;
     });
+    document.querySelectorAll('.scene-btn.active').forEach(el => el.classList.remove('active'));
+    const allOffBtn = document.querySelector('.scene-btn');
+    if (allOffBtn && allOffBtn.textContent === 'all-off') allOffBtn.classList.add('active');
     api('POST', '/devices/all/off').then(() => toast('All off')).catch(e => toast(e.message, 'error'));
     return;
   }
