@@ -2,7 +2,7 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/dr-nico-f/smart-light-controller)](https://github.com/dr-nico-f/smart-light-controller/releases) [![CI](https://github.com/dr-nico-f/smart-light-controller/actions/workflows/ci.yml/badge.svg)](https://github.com/dr-nico-f/smart-light-controller/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Local-First Tuya Smart Bulb Control**
+**Local-First Tuya Smart Bulb Control** | [**Live Demo**](https://dr-nico-f.github.io/smart-light-controller/)
 
 CLI, Python library, and HTTP API for controlling Tuya-based RGBCW smart bulbs directly over the LAN — no cloud round-trip required. Includes named colour presets, smooth transitions, scene orchestration, device discovery, network diagnostics, and an automation engine.
 

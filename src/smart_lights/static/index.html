@@ -396,6 +396,45 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 <script>
 const API = '';
+let demoMode = false;
+
+const DEMO_DEVICES = [
+  { slug: 'living-room-top', name: 'Living Room Top', ip_address: '192.168.1.10', room: 'living-room', groups: ['ceiling'] },
+  { slug: 'living-room-bottom', name: 'Living Room Bottom', ip_address: '192.168.1.11', room: 'living-room', groups: ['ceiling'] },
+  { slug: 'living-room-lamp', name: 'Living Room Lamp', ip_address: '192.168.1.12', room: 'living-room', groups: ['floor'] },
+  { slug: 'bedroom-main', name: 'Bedroom Main', ip_address: '192.168.1.20', room: 'bedroom', groups: ['ceiling'] },
+  { slug: 'office-desk', name: 'Office Desk', ip_address: '192.168.1.30', room: 'office', groups: ['desk'] },
+];
+
+const DEMO_SCENES = ['all-off', 'movie-time', 'reading', 'party', 'focus', 'goodnight'];
+
+const DEMO_COLOURS = [
+  { name: 'red', hue: 0, saturation: 1000, value: 1000 },
+  { name: 'sunset-orange', hue: 20, saturation: 900, value: 800 },
+  { name: 'orange', hue: 30, saturation: 1000, value: 1000 },
+  { name: 'amber', hue: 38, saturation: 1000, value: 1000 },
+  { name: 'warm-white', hue: 40, saturation: 200, value: 1000 },
+  { name: 'gold', hue: 45, saturation: 900, value: 1000 },
+  { name: 'yellow', hue: 60, saturation: 1000, value: 1000 },
+  { name: 'lime', hue: 90, saturation: 1000, value: 1000 },
+  { name: 'green', hue: 120, saturation: 1000, value: 1000 },
+  { name: 'forest-green', hue: 140, saturation: 900, value: 600 },
+  { name: 'teal', hue: 165, saturation: 900, value: 700 },
+  { name: 'cyan', hue: 180, saturation: 1000, value: 1000 },
+  { name: 'ice-blue', hue: 195, saturation: 500, value: 1000 },
+  { name: 'daylight', hue: 200, saturation: 100, value: 1000 },
+  { name: 'ocean-blue', hue: 210, saturation: 800, value: 700 },
+  { name: 'moonlight', hue: 220, saturation: 150, value: 700 },
+  { name: 'blue', hue: 240, saturation: 1000, value: 1000 },
+  { name: 'lavender', hue: 260, saturation: 400, value: 900 },
+  { name: 'purple', hue: 270, saturation: 1000, value: 1000 },
+  { name: 'magenta', hue: 300, saturation: 1000, value: 1000 },
+  { name: 'pink', hue: 330, saturation: 700, value: 1000 },
+  { name: 'hot-pink', hue: 340, saturation: 900, value: 1000 },
+  { name: 'crimson', hue: 348, saturation: 950, value: 800 },
+  { name: 'coral', hue: 16, saturation: 800, value: 1000 },
+  { name: 'candlelight', hue: 30, saturation: 600, value: 600 },
+];
 
 let devices = [];
 let selectedDevice = null;
@@ -410,6 +449,9 @@ function toast(message, type = 'success') {
 }
 
 async function api(method, path, body = null) {
+  if (demoMode) {
+    return demoResponse(method, path, body);
+  }
   const opts = { method, headers: {} };
   if (body) {
     opts.headers['Content-Type'] = 'application/json';
@@ -421,6 +463,15 @@ async function api(method, path, body = null) {
     throw new Error(err.detail || `HTTP ${res.status}`);
   }
   return res.json();
+}
+
+function demoResponse(method, path, body) {
+  if (path === '/devices') return DEMO_DEVICES;
+  if (path === '/scenes') return DEMO_SCENES;
+  if (path === '/colours') return DEMO_COLOURS;
+  if (path.includes('/status')) return [{ target: path.split('/')[2], success: true, transport: 'demo', response: { dps: { '20': true, '21': 'white', '22': 800 } } }];
+  if (method === 'POST') return [{ target: path.split('/')[2] || 'all', success: true, transport: 'demo', response: {} }];
+  return {};
 }
 
 function hsvToHex(h, s, v) {
@@ -482,8 +533,8 @@ function renderFadeTargets() {
 function updateStatusBar() {
   const bar = document.getElementById('statusBar');
   bar.innerHTML = `
-    <div class="stat"><span class="dot"></span> ${devices.length} device${devices.length !== 1 ? 's' : ''}</div>
-    <div class="stat">LAN control active</div>
+    <div class="stat"><span class="dot${demoMode ? ' offline' : ''}"></span> ${devices.length} device${devices.length !== 1 ? 's' : ''}</div>
+    <div class="stat">${demoMode ? 'Demo mode' : 'LAN control active'}</div>
   `;
 }
 
@@ -567,9 +618,18 @@ async function runBreathe() {
   }
 }
 
-// Init
-Promise.all([loadDevices(), loadColours(), loadScenes()])
-  .catch(e => toast('Failed to connect to API: ' + e.message, 'error'));
+// Init -- try live API first, fall back to demo mode
+async function init() {
+  try {
+    await fetch('/devices');
+    await Promise.all([loadDevices(), loadColours(), loadScenes()]);
+  } catch (e) {
+    demoMode = true;
+    document.querySelector('header p').textContent = 'Demo mode — no live API connected';
+    await Promise.all([loadDevices(), loadColours(), loadScenes()]);
+  }
+}
+init();
 </script>
 </body>
 </html>
