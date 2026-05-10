@@ -8,126 +8,187 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface-hover: #222632;
-  --border: #2a2e3a;
-  --text: #e4e4e7;
-  --text-muted: #8b8d97;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --success: #22c55e;
+  --bg: #08090d;
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-border: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --glass: rgba(15, 18, 30, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text: #f0f0f3;
+  --text-secondary: #9ca3af;
+  --text-dim: #6b7280;
+  --accent: #7c3aed;
+  --accent-glow: rgba(124, 58, 237, 0.4);
+  --accent-soft: rgba(124, 58, 237, 0.15);
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.4);
   --danger: #ef4444;
-  --warning: #f59e0b;
-  --radius: 12px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --radius: 16px;
+  --radius-sm: 10px;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 24px;
+  overflow-x: hidden;
 }
 
+/* Ambient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+              radial-gradient(ellipse at 50% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+  z-index: -1;
+  animation: ambientShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes ambientShift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(-2%, 1%) rotate(1deg); }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+/* Header */
 header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 48px;
 }
 
 header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-header p {
-  color: var(--text-muted);
-  margin-top: 4px;
+header .subtitle {
+  color: var(--text-secondary);
+  margin-top: 6px;
   font-size: 0.9rem;
+  font-weight: 400;
 }
 
-.status-bar {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 12px;
-  font-size: 0.8rem;
-}
-
-.status-bar .stat {
-  display: flex;
+.status-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
+  gap: 8px;
+  margin-top: 16px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
-.status-bar .dot {
-  width: 8px;
-  height: 8px;
+.status-pill .dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--success);
+  box-shadow: 0 0 8px var(--success-glow);
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.status-bar .dot.offline { background: var(--danger); }
+.status-pill .dot.demo { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
 
-/* Sections */
-.section-title {
-  font-size: 0.75rem;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-  padding-left: 4px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  padding-left: 2px;
 }
+
+section { margin-bottom: 40px; }
 
 /* Device Grid */
 .devices-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
 }
 
 .device-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 20px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.device-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .device-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
+  border-color: rgba(124, 58, 237, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.1);
 }
+
+.device-card:hover::before { opacity: 1; }
 
 .device-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16px;
+  position: relative;
 }
 
 .device-info h3 {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.device-info .room {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 2px;
+.device-info .meta {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 3px;
 }
 
-/* Toggle Switch */
+/* Toggle */
 .toggle {
   position: relative;
-  width: 44px;
-  height: 24px;
+  width: 40px;
+  height: 22px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .toggle input { display: none; }
@@ -135,106 +196,126 @@ header p {
 .toggle .slider {
   position: absolute;
   inset: 0;
-  background: var(--border);
-  border-radius: 12px;
-  transition: background 0.3s;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 11px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggle .slider::before {
   content: '';
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   left: 3px;
   top: 3px;
-  background: white;
+  background: var(--text-secondary);
   border-radius: 50%;
-  transition: transform 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toggle input:checked + .slider { background: var(--success); }
-.toggle input:checked + .slider::before { transform: translateX(20px); }
+.toggle input:checked + .slider {
+  background: var(--success);
+  box-shadow: 0 0 12px var(--success-glow);
+}
+
+.toggle input:checked + .slider::before {
+  transform: translateX(18px);
+  background: white;
+}
 
 /* Brightness Slider */
 .brightness-control {
-  margin-top: 12px;
+  position: relative;
+  margin-top: 14px;
 }
 
-.brightness-control label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.brightness-control .label-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.brightness-control .label-row .val {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.2) 100%);
   outline: none;
+  transition: height 0.2s;
 }
+
+input[type="range"]:hover { height: 6px; }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--accent);
+  background: white;
+  box-shadow: 0 0 8px rgba(255,255,255,0.3);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  background: var(--accent-hover);
+  transform: scale(1.3);
+  box-shadow: 0 0 12px rgba(255,255,255,0.5);
 }
 
 /* Colour Presets */
-.colours-section { margin-bottom: 32px; }
-
 .colour-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  padding: 4px;
 }
 
 .colour-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3);
 }
 
 .colour-btn:hover {
-  transform: scale(1.2);
-  border-color: white;
+  transform: scale(1.35);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 16px var(--glow-colour, rgba(255,255,255,0.3));
 }
 
 .colour-btn .tooltip {
   display: none;
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.7rem;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.68rem;
   white-space: nowrap;
   pointer-events: none;
+  color: var(--text);
 }
 
 .colour-btn:hover .tooltip { display: block; }
 
 /* Scenes */
-.scenes-section { margin-bottom: 32px; }
-
 .scenes-grid {
   display: flex;
   flex-wrap: wrap;
@@ -242,75 +323,116 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .scene-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 18px;
-  color: var(--text);
-  font-size: 0.85rem;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scene-btn:hover {
+  background: var(--accent-soft);
+  border-color: rgba(124, 58, 237, 0.4);
+  color: var(--text);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+  transform: translateY(-1px);
+}
+
+.scene-btn:active {
+  transform: translateY(0);
   background: var(--accent);
-  border-color: var(--accent);
   color: white;
 }
 
-.scene-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
+/* Transitions Panel */
+.transitions-panel {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px;
 }
 
-/* Fade Controls */
-.fade-section { margin-bottom: 32px; }
-
-.fade-controls {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
+.transitions-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 16px;
   align-items: end;
+  margin-bottom: 16px;
 }
 
-.fade-controls .field label {
+.field label {
   display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.fade-controls input[type="number"],
-.fade-controls select {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
+.field select,
+.field input[type="number"] {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 10px 14px;
   color: var(--text);
   font-size: 0.85rem;
-  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.field select:focus,
+.field input[type="number"]:focus {
+  outline: none;
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .btn {
-  background: var(--accent);
+  padding: 12px 24px;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  color: white;
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn:hover { background: var(--accent-hover); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  color: white;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
 
-/* Toast Notifications */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* Toast */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -322,75 +444,85 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .toast {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
   font-size: 0.8rem;
-  animation: slideIn 0.3s ease;
-  max-width: 300px;
+  animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 320px;
+  color: var(--text-secondary);
 }
 
 .toast.success { border-left: 3px solid var(--success); }
 .toast.error { border-left: 3px solid var(--danger); }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(30px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
-/* Loading state */
-.loading { opacity: 0.5; pointer-events: none; }
-
 /* Responsive */
-@media (max-width: 600px) {
-  .fade-controls { grid-template-columns: 1fr; }
-  .devices-grid { grid-template-columns: 1fr; }
+@media (max-width: 768px) {
+  .devices-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .transitions-grid { grid-template-columns: 1fr; }
+  .container { padding: 24px 16px; }
+  header h1 { font-size: 1.5rem; }
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Smart Light Controller</h1>
-  <p>Local-first Tuya bulb control</p>
-  <div class="status-bar" id="statusBar"></div>
-</header>
-
-<section>
-  <div class="section-title">Devices</div>
-  <div class="devices-grid" id="devicesGrid"></div>
-</section>
-
-<section class="colours-section">
-  <div class="section-title">Colour Presets</div>
-  <div class="colour-grid" id="colourGrid"></div>
-</section>
-
-<section class="scenes-section">
-  <div class="section-title">Scenes</div>
-  <div class="scenes-grid" id="scenesGrid"></div>
-</section>
-
-<section class="fade-section">
-  <div class="section-title">Transitions</div>
-  <div class="fade-controls">
-    <div class="field">
-      <label>Target</label>
-      <select id="fadeTarget"></select>
+<div class="container">
+  <header>
+    <h1>Smart Light Controller</h1>
+    <p class="subtitle">Local-first Tuya bulb control</p>
+    <div class="status-pill" id="statusPill">
+      <span class="dot"></span>
+      <span>Connecting...</span>
     </div>
-    <div class="field">
-      <label>Brightness</label>
-      <input type="number" id="fadeBrightness" min="0" max="100" value="80">
+  </header>
+
+  <section>
+    <div class="section-header">Devices</div>
+    <div class="devices-grid" id="devicesGrid"></div>
+  </section>
+
+  <section>
+    <div class="section-header">Colour Presets</div>
+    <div class="colour-grid" id="colourGrid"></div>
+  </section>
+
+  <section>
+    <div class="section-header">Scenes</div>
+    <div class="scenes-grid" id="scenesGrid"></div>
+  </section>
+
+  <section>
+    <div class="section-header">Transitions</div>
+    <div class="transitions-panel">
+      <div class="transitions-grid">
+        <div class="field">
+          <label>Target</label>
+          <select id="fadeTarget"></select>
+        </div>
+        <div class="field">
+          <label>Brightness</label>
+          <input type="number" id="fadeBrightness" min="0" max="100" value="80">
+        </div>
+        <div class="field">
+          <label>Duration (s)</label>
+          <input type="number" id="fadeDuration" min="0.5" max="30" step="0.5" value="3">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runFade()">Fade</button>
+        <button class="btn btn-secondary" onclick="runBreathe()">Breathe</button>
+      </div>
     </div>
-    <div class="field">
-      <label>Duration (s)</label>
-      <input type="number" id="fadeDuration" min="0.5" max="30" step="0.5" value="3">
-    </div>
-    <button class="btn" onclick="runFade()">Fade</button>
-    <button class="btn" onclick="runBreathe()" style="background: var(--surface); border: 1px solid var(--border);">Breathe</button>
-  </div>
-</section>
+  </section>
+</div>
 
 <div class="toast-container" id="toasts"></div>
 
@@ -437,7 +569,6 @@ const DEMO_COLOURS = [
 ];
 
 let devices = [];
-let selectedDevice = null;
 
 function toast(message, type = 'success') {
   const container = document.getElementById('toasts');
@@ -445,13 +576,11 @@ function toast(message, type = 'success') {
   el.className = `toast ${type}`;
   el.textContent = message;
   container.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
 }
 
 async function api(method, path, body = null) {
-  if (demoMode) {
-    return demoResponse(method, path, body);
-  }
+  if (demoMode) return demoResponse(method, path, body);
   const opts = { method, headers: {} };
   if (body) {
     opts.headers['Content-Type'] = 'application/json';
@@ -469,16 +598,14 @@ function demoResponse(method, path, body) {
   if (path === '/devices') return DEMO_DEVICES;
   if (path === '/scenes') return DEMO_SCENES;
   if (path === '/colours') return DEMO_COLOURS;
-  if (path.includes('/status')) return [{ target: path.split('/')[2], success: true, transport: 'demo', response: { dps: { '20': true, '21': 'white', '22': 800 } } }];
+  if (path.includes('/status')) return [{ target: path.split('/')[2], success: true, transport: 'demo', response: { dps: { '20': true } } }];
   if (method === 'POST') return [{ target: path.split('/')[2] || 'all', success: true, transport: 'demo', response: {} }];
   return {};
 }
 
 function hsvToHex(h, s, v) {
-  s = s / 1000; v = v / 1000;
-  const c = v * s;
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  const m = v - c;
+  s /= 1000; v /= 1000;
+  const c = v * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = v - c;
   let r, g, b;
   if (h < 60) { r = c; g = x; b = 0; }
   else if (h < 120) { r = x; g = c; b = 0; }
@@ -486,15 +613,14 @@ function hsvToHex(h, s, v) {
   else if (h < 240) { r = 0; g = x; b = c; }
   else if (h < 300) { r = x; g = 0; b = c; }
   else { r = c; g = 0; b = x; }
-  const toHex = (n) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  const hex = (n) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+  return `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
 async function loadDevices() {
   devices = await api('GET', '/devices');
   renderDevices();
   renderFadeTargets();
-  updateStatusBar();
 }
 
 function renderDevices() {
@@ -504,21 +630,21 @@ function renderDevices() {
       <div class="device-header">
         <div class="device-info">
           <h3>${d.name}</h3>
-          <div class="room">${d.room || 'No room'} · ${d.ip_address}</div>
+          <div class="meta">${d.room || 'unassigned'} · ${d.ip_address}</div>
         </div>
         <label class="toggle">
-          <input type="checkbox" onchange="toggleDevice('${d.slug}', this.checked)">
+          <input type="checkbox" checked onchange="toggleDevice('${d.slug}', this.checked)">
           <span class="slider"></span>
         </label>
       </div>
       <div class="brightness-control">
-        <label>
+        <div class="label-row">
           <span>Brightness</span>
-          <span class="brightness-value">50%</span>
-        </label>
-        <input type="range" min="0" max="100" value="50"
+          <span class="val">${70 + Math.floor(Math.random() * 30)}%</span>
+        </div>
+        <input type="range" min="0" max="100" value="${70 + Math.floor(Math.random() * 30)}"
           onchange="setBrightness('${d.slug}', this.value)"
-          oninput="this.previousElementSibling.querySelector('.brightness-value').textContent = this.value + '%'">
+          oninput="this.parentElement.querySelector('.val').textContent = this.value + '%'">
       </div>
     </div>
   `).join('');
@@ -530,40 +656,28 @@ function renderFadeTargets() {
   select.innerHTML = options.map(d => `<option value="${d.slug}">${d.name}</option>`).join('');
 }
 
-function updateStatusBar() {
-  const bar = document.getElementById('statusBar');
-  bar.innerHTML = `
-    <div class="stat"><span class="dot${demoMode ? ' offline' : ''}"></span> ${devices.length} device${devices.length !== 1 ? 's' : ''}</div>
-    <div class="stat">${demoMode ? 'Demo mode' : 'LAN control active'}</div>
-  `;
-}
-
 async function toggleDevice(slug, on) {
   try {
     await api('POST', `/devices/${slug}/${on ? 'on' : 'off'}`);
-    toast(`${slug} turned ${on ? 'on' : 'off'}`);
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+    toast(`${slug} ${on ? 'on' : 'off'}`);
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function setBrightness(slug, value) {
-  try {
-    await api('POST', `/devices/${slug}/brightness`, { brightness: parseInt(value) });
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+  try { await api('POST', `/devices/${slug}/brightness`, { brightness: parseInt(value) }); }
+  catch (e) { toast(e.message, 'error'); }
 }
 
 async function loadColours() {
   const colours = await api('GET', '/colours');
   const grid = document.getElementById('colourGrid');
-  grid.innerHTML = colours.map(c => `
-    <button class="colour-btn" style="background: ${hsvToHex(c.hue, c.saturation, c.value)}"
+  grid.innerHTML = colours.map(c => {
+    const hex = hsvToHex(c.hue, c.saturation, c.value);
+    return `<button class="colour-btn" style="background: ${hex}; --glow-colour: ${hex}80"
       onclick="applyColour('${c.name}')">
       <span class="tooltip">${c.name}</span>
-    </button>
-  `).join('');
+    </button>`;
+  }).join('');
 }
 
 async function applyColour(name) {
@@ -571,26 +685,22 @@ async function applyColour(name) {
   try {
     await api('POST', `/devices/${target}/colour`, { preset: name });
     toast(`${target} → ${name}`);
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function loadScenes() {
   const scenes = await api('GET', '/scenes');
   const grid = document.getElementById('scenesGrid');
-  grid.innerHTML = scenes.map(s => `
-    <button class="scene-btn" onclick="applyScene('${s}')">${s}</button>
-  `).join('');
+  grid.innerHTML = scenes.map(s =>
+    `<button class="scene-btn" onclick="applyScene('${s}')">${s}</button>`
+  ).join('');
 }
 
 async function applyScene(name) {
   try {
     await api('POST', `/scenes/${name}`);
     toast(`Scene: ${name}`);
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function runFade() {
@@ -598,12 +708,10 @@ async function runFade() {
   const brightness = parseInt(document.getElementById('fadeBrightness').value);
   const duration = parseFloat(document.getElementById('fadeDuration').value);
   try {
-    toast(`Fading ${target} to ${brightness}%...`);
+    toast(`Fading ${target}...`);
     await api('POST', `/devices/${target}/fade`, { brightness, duration, start: 0, steps: 20 });
-    toast(`Fade complete`);
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+    toast('Fade complete');
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function runBreathe() {
@@ -612,23 +720,31 @@ async function runBreathe() {
   try {
     toast(`Breathing ${target}...`);
     await api('POST', `/devices/${target}/breathe`, { cycles: 3, cycle_duration: duration, low: 10, high: 90 });
-    toast(`Breathe complete`);
-  } catch (e) {
-    toast(e.message, 'error');
-  }
+    toast('Breathe complete');
+  } catch (e) { toast(e.message, 'error'); }
 }
 
-// Init -- try live API first, fall back to demo mode
+function updateStatus() {
+  const pill = document.getElementById('statusPill');
+  pill.innerHTML = `
+    <span class="dot${demoMode ? ' demo' : ''}"></span>
+    <span>${demoMode ? 'Demo · ' : ''}${devices.length} device${devices.length !== 1 ? 's' : ''}${!demoMode ? ' · LAN' : ''}</span>
+  `;
+}
+
 async function init() {
   try {
-    await fetch('/devices');
+    const res = await fetch('/devices');
+    if (!res.ok) throw new Error();
     await Promise.all([loadDevices(), loadColours(), loadScenes()]);
-  } catch (e) {
+  } catch {
     demoMode = true;
-    document.querySelector('header p').textContent = 'Demo mode — no live API connected';
+    document.querySelector('.subtitle').textContent = 'Interactive demo — connect API for live control';
     await Promise.all([loadDevices(), loadColours(), loadScenes()]);
   }
+  updateStatus();
 }
+
 init();
 </script>
 </body>
