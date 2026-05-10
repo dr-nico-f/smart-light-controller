@@ -341,66 +341,61 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /* Colour Presets */
-.colour-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
 .colour-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   padding: 4px;
-  flex: 1;
+  align-items: center;
 }
 
-.colour-picker-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.colour-picker-inline {
+  position: relative;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
 }
 
-.colour-picker-wrap input[type="color"] {
+.colour-picker-inline input[type="color"] {
   -webkit-appearance: none;
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--glass-border);
+  width: 34px;
+  height: 34px;
+  border: 2px dashed rgba(255,255,255,0.2);
   border-radius: 50%;
   background: none;
   cursor: pointer;
   padding: 0;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
-.colour-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-.colour-picker-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+.colour-picker-inline input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.colour-picker-inline input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
 
-.colour-picker-wrap input[type="color"]:hover {
+.colour-picker-inline input[type="color"]:hover {
   border-color: var(--accent);
   box-shadow: 0 0 12px var(--accent-glow);
+  transform: scale(1.35);
 }
 
-.colour-picker-wrap .apply-custom {
-  background: var(--surface);
+.colour-picker-inline .picker-label {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
+  padding: 5px 10px;
   border-radius: 8px;
-  padding: 8px 14px;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.colour-picker-wrap .apply-custom:hover {
-  background: var(--accent-soft);
-  border-color: rgba(124, 58, 237, 0.4);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  pointer-events: none;
   color: var(--text);
 }
+
+.colour-picker-inline:hover .picker-label { display: block; }
 
 /* Keyboard Hints */
 .kbd-bar {
@@ -650,7 +645,6 @@ kbd {
   .transitions-grid { grid-template-columns: 1fr; }
   .container { padding: 24px 16px; }
   header h1 { font-size: 1.5rem; }
-  .colour-section { flex-direction: column; align-items: flex-start; }
   .kbd-bar { display: none; }
 }
 </style>
@@ -674,13 +668,7 @@ kbd {
 
   <section>
     <div class="section-header">Colours</div>
-    <div class="colour-section">
-      <div class="colour-grid" id="colourGrid"></div>
-      <div class="colour-picker-wrap">
-        <input type="color" id="customColour" value="#7c3aed" title="Pick custom colour">
-        <button class="apply-custom" onclick="applyCustomColour()">Apply</button>
-      </div>
-    </div>
+    <div class="colour-grid" id="colourGrid"></div>
   </section>
 
   <section>
@@ -732,7 +720,9 @@ const DEMO_DEVICES = [
   { slug: 'living-room-bottom', name: 'Living Room Bottom', ip_address: '192.168.1.11', room: 'living-room', groups: ['ceiling'] },
   { slug: 'living-room-lamp', name: 'Living Room Lamp', ip_address: '192.168.1.12', room: 'living-room', groups: ['floor'] },
   { slug: 'bedroom-main', name: 'Bedroom Main', ip_address: '192.168.1.20', room: 'bedroom', groups: ['ceiling'] },
+  { slug: 'bedroom-nightstand', name: 'Bedroom Nightstand', ip_address: '192.168.1.21', room: 'bedroom', groups: ['accent'] },
   { slug: 'office-desk', name: 'Office Desk', ip_address: '192.168.1.30', room: 'office', groups: ['desk'] },
+  { slug: 'office-shelf', name: 'Office Shelf', ip_address: '192.168.1.31', room: 'office', groups: ['accent'] },
 ];
 
 const DEMO_SCENES = ['all-off', 'movie-time', 'reading', 'party', 'focus', 'goodnight'];
@@ -926,13 +916,18 @@ async function setBrightness(slug, value) {
 async function loadColours() {
   const colours = await api('GET', '/colours');
   const grid = document.getElementById('colourGrid');
-  grid.innerHTML = colours.map((c, i) => {
+  const swatches = colours.map((c, i) => {
     const hex = hsvToHex(c.hue, c.saturation, c.value);
     return `<button class="colour-btn" style="background: ${hex}; --glow-colour: ${hex}80; animation-delay: ${i * 30}ms"
       onclick="applyColour('${c.name}')">
       <span class="tooltip">${c.name}</span>
     </button>`;
   }).join('');
+  const picker = `<div class="colour-picker-inline" style="animation-delay: ${colours.length * 30}ms">
+    <input type="color" id="customColour" value="#7c3aed" onchange="applyCustomColour()">
+    <span class="picker-label">custom</span>
+  </div>`;
+  grid.innerHTML = swatches + picker;
 }
 
 async function applyColour(name) {
