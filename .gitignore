@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+
+# macOS
+.DS_Store
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Tuya secrets & device data (API keys, device keys, local IPs, MACs)
+tinytuya.json
+devices.json
+snapshot.json
+tuya-raw.json
+config/
+
+# Python bytecode & packaging artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
