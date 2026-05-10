@@ -340,6 +340,46 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 14px;
 }
 
+/* Colour Target Bar */
+.colour-target-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.colour-target-bar .label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 4px;
+}
+
+.target-pill {
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.target-pill:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text);
+}
+
+.target-pill.active {
+  background: var(--accent-soft);
+  border-color: rgba(124, 58, 237, 0.5);
+  color: var(--text);
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.15);
+}
+
 /* Colour Presets */
 .colour-grid {
   display: flex;
@@ -349,33 +389,48 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
 }
 
+.colour-btn.active {
+  border-color: white;
+  box-shadow: 0 0 14px var(--glow-colour, rgba(255,255,255,0.4)), inset 0 0 0 1px rgba(255,255,255,0.3);
+  transform: scale(1.15);
+}
+
+@keyframes colourPop {
+  0% { transform: scale(1.15); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1.15); }
+}
+
+/* Custom Colour Picker */
 .colour-picker-inline {
   position: relative;
   width: 34px;
   height: 34px;
   flex-shrink: 0;
+  border-radius: 50%;
+  background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+  padding: 3px;
 }
 
 .colour-picker-inline input[type="color"] {
   -webkit-appearance: none;
-  width: 34px;
-  height: 34px;
-  border: 2px dashed rgba(255,255,255,0.2);
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--bg);
   border-radius: 50%;
   background: none;
   cursor: pointer;
   padding: 0;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .colour-picker-inline input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 .colour-picker-inline input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
 
-.colour-picker-inline input[type="color"]:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px var(--accent-glow);
+.colour-picker-inline:hover {
   transform: scale(1.35);
+  box-shadow: 0 0 14px rgba(255,255,255,0.25);
 }
 
 .colour-picker-inline .picker-label {
@@ -668,6 +723,7 @@ kbd {
 
   <section>
     <div class="section-header">Colours</div>
+    <div class="colour-target-bar" id="colourTargetBar"></div>
     <div class="colour-grid" id="colourGrid"></div>
   </section>
 
@@ -756,6 +812,7 @@ const DEMO_COLOURS = [
 ];
 
 let devices = [];
+let colourTarget = 'all';
 
 function toast(message, type = 'success') {
   const container = document.getElementById('toasts');
@@ -836,7 +893,25 @@ async function loadDevices() {
   devices = await api('GET', '/devices');
   lastRefreshed = new Date();
   renderDevices();
+  renderColourTargetBar();
   renderFadeTargets();
+}
+
+function renderColourTargetBar() {
+  const bar = document.getElementById('colourTargetBar');
+  const targets = [{ slug: 'all', name: 'All Devices' }, ...devices];
+  bar.innerHTML = `<span class="label">Controlling</span>` +
+    targets.map(t =>
+      `<button class="target-pill${t.slug === colourTarget ? ' active' : ''}"
+        onclick="selectColourTarget('${t.slug}')">${t.name}</button>`
+    ).join('');
+}
+
+function selectColourTarget(slug) {
+  colourTarget = slug;
+  renderColourTargetBar();
+  const name = slug === 'all' ? 'All Devices' : (devices.find(d => d.slug === slug)?.name || slug);
+  toast(`Controlling: ${name}`);
 }
 
 function renderDevices() {
@@ -919,7 +994,7 @@ async function loadColours() {
   const swatches = colours.map((c, i) => {
     const hex = hsvToHex(c.hue, c.saturation, c.value);
     return `<button class="colour-btn" style="background: ${hex}; --glow-colour: ${hex}80; animation-delay: ${i * 30}ms"
-      onclick="applyColour('${c.name}')">
+      onclick="applyColour('${c.name}', this)">
       <span class="tooltip">${c.name}</span>
     </button>`;
   }).join('');
@@ -930,21 +1005,32 @@ async function loadColours() {
   grid.innerHTML = swatches + picker;
 }
 
-async function applyColour(name) {
-  const target = document.getElementById('fadeTarget').value;
+function setActiveSwatch(btn) {
+  document.querySelectorAll('.colour-btn.active').forEach(el => el.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.animation = 'colourPop 0.3s ease';
+    setTimeout(() => btn.style.animation = '', 300);
+  }
+}
+
+async function applyColour(name, btn) {
+  const targetName = colourTarget === 'all' ? 'All Devices' : (devices.find(d => d.slug === colourTarget)?.name || colourTarget);
+  setActiveSwatch(btn);
   try {
-    await api('POST', `/devices/${target}/colour`, { preset: name });
-    toast(`${target} → ${name}`);
+    await api('POST', `/devices/${colourTarget}/colour`, { preset: name });
+    toast(`${targetName} → ${name}`);
   } catch (e) { toast(e.message, 'error'); }
 }
 
 async function applyCustomColour() {
   const hex = document.getElementById('customColour').value;
   const { hue, saturation, value } = hexToHsv(hex);
-  const target = document.getElementById('fadeTarget').value;
+  const targetName = colourTarget === 'all' ? 'All Devices' : (devices.find(d => d.slug === colourTarget)?.name || colourTarget);
+  setActiveSwatch(null);
   try {
-    await api('POST', `/devices/${target}/colour`, { hue, saturation, value });
-    toast(`${target} → ${hex}`);
+    await api('POST', `/devices/${colourTarget}/colour`, { hue, saturation, value });
+    toast(`${targetName} → ${hex}`);
   } catch (e) { toast(e.message, 'error'); }
 }
 
