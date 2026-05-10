@@ -193,6 +193,23 @@ section { margin-bottom: 40px; }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Colour accent strip at top of card */
+.device-card .colour-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+
+.device-card .colour-strip.active {
+  height: 3px;
+  box-shadow: 0 2px 12px var(--strip-colour, transparent);
+}
+
 .device-card::before {
   content: '';
   position: absolute;
@@ -933,6 +950,7 @@ function renderDevices() {
           const idx = cardIndex++;
           return `
           <div class="device-card" data-slug="${d.slug}" style="animation-delay: ${idx * 0.06}s">
+            <div class="colour-strip"></div>
             <div class="device-header">
               <div class="device-info">
                 <h3>${d.name}</h3>
@@ -1014,9 +1032,29 @@ function setActiveSwatch(btn) {
   }
 }
 
+function updateColourStrips(hex) {
+  const targetSlugs = colourTarget === 'all' ? devices.map(d => d.slug) : [colourTarget];
+  targetSlugs.forEach(slug => {
+    const card = document.querySelector(`.device-card[data-slug="${slug}"]`);
+    if (!card) return;
+    const strip = card.querySelector('.colour-strip');
+    strip.style.background = hex;
+    strip.style.setProperty('--strip-colour', hex + '80');
+    strip.classList.add('active');
+  });
+}
+
 async function applyColour(name, btn) {
   const targetName = colourTarget === 'all' ? 'All Devices' : (devices.find(d => d.slug === colourTarget)?.name || colourTarget);
   setActiveSwatch(btn);
+  const hex = btn ? getComputedStyle(btn).backgroundColor : null;
+  if (hex) {
+    const match = hex.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (match) {
+      const toHex = n => parseInt(n).toString(16).padStart(2, '0');
+      updateColourStrips(`#${toHex(match[1])}${toHex(match[2])}${toHex(match[3])}`);
+    }
+  }
   try {
     await api('POST', `/devices/${colourTarget}/colour`, { preset: name });
     toast(`${targetName} → ${name}`);
@@ -1028,6 +1066,7 @@ async function applyCustomColour() {
   const { hue, saturation, value } = hexToHsv(hex);
   const targetName = colourTarget === 'all' ? 'All Devices' : (devices.find(d => d.slug === colourTarget)?.name || colourTarget);
   setActiveSwatch(null);
+  updateColourStrips(hex);
   try {
     await api('POST', `/devices/${colourTarget}/colour`, { hue, saturation, value });
     toast(`${targetName} → ${hex}`);
