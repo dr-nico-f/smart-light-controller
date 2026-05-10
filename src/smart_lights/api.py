@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from smart_lights.colours import list_presets, resolve_colour
 from smart_lights.service import SmartLightsService
+
+STATIC_DIR = Path(__file__).parent / "static"
 
 app = FastAPI(
     title="Smart Light Controller",
@@ -205,3 +210,9 @@ def diagnose(target: str = "all") -> dict[str, Any]:
         return get_service().diagnose(target)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/", include_in_schema=False)
+def dashboard() -> FileResponse:
+    """Serve the web dashboard."""
+    return FileResponse(STATIC_DIR / "index.html")

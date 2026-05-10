@@ -110,13 +110,15 @@ smart-lights diagnose all --timeout 2
 smart-lights status all
 ```
 
-### HTTP API
+### HTTP API & Web Dashboard
 
 ```bash
 smart-lights serve --port 8000
 ```
 
-Then interact via curl or any HTTP client:
+Open `http://localhost:8000` for the **web control dashboard** — a dark-themed control panel with device cards, colour presets, scene buttons, brightness sliders, and transition controls.
+
+Interactive API docs are at `http://localhost:8000/docs`. You can also use the API directly:
 
 ```bash
 curl http://localhost:8000/devices
@@ -126,8 +128,6 @@ curl -X POST http://localhost:8000/devices/living-room/colour \
   -d '{"preset": "ocean-blue"}'
 curl -X POST http://localhost:8000/scenes/movie-time
 ```
-
-Interactive API docs at `http://localhost:8000/docs`.
 
 ---
 
@@ -147,6 +147,7 @@ src/smart_lights/
   transitions.py      → fade and breathe transition effects
   automation.py       → trigger-to-scene automation engine
   api.py              → FastAPI HTTP server
+  static/index.html   → web control dashboard (dark theme, no build step)
   py.typed            → PEP 561 type-checking marker
 
 config.example/        → sanitized example configs (copy to config/ and edit)
