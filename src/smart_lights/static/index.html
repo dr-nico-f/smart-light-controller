@@ -802,13 +802,13 @@ let demoMode = false;
 let lastRefreshed = null;
 
 const DEMO_DEVICES = [
-  { slug: 'living-room-top', name: 'Living Room Top', ip_address: '192.168.1.10', room: 'living-room', groups: ['ceiling'] },
-  { slug: 'living-room-bottom', name: 'Living Room Bottom', ip_address: '192.168.1.11', room: 'living-room', groups: ['ceiling'] },
-  { slug: 'living-room-lamp', name: 'Living Room Lamp', ip_address: '192.168.1.12', room: 'living-room', groups: ['floor'] },
-  { slug: 'bedroom-main', name: 'Bedroom Main', ip_address: '192.168.1.20', room: 'bedroom', groups: ['ceiling'] },
-  { slug: 'bedroom-nightstand', name: 'Bedroom Nightstand', ip_address: '192.168.1.21', room: 'bedroom', groups: ['accent'] },
-  { slug: 'office-desk', name: 'Office Desk', ip_address: '192.168.1.30', room: 'office', groups: ['desk'] },
-  { slug: 'office-shelf', name: 'Office Shelf', ip_address: '192.168.1.31', room: 'office', groups: ['accent'] },
+  { slug: 'living-room-top', name: 'Living Room Top', ip_address: '192.168.1.10', room: 'living-room', groups: ['ceiling'], _demo: { brightness: 85, colour: '#e67e22' } },
+  { slug: 'living-room-bottom', name: 'Living Room Bottom', ip_address: '192.168.1.11', room: 'living-room', groups: ['ceiling'], _demo: { brightness: 72, colour: '#f39c12' } },
+  { slug: 'living-room-lamp', name: 'Living Room Lamp', ip_address: '192.168.1.12', room: 'living-room', groups: ['floor'], _demo: { brightness: 45, colour: '#9b59b6' } },
+  { slug: 'bedroom-main', name: 'Bedroom Main', ip_address: '192.168.1.20', room: 'bedroom', groups: ['ceiling'], _demo: { brightness: 60, colour: '#3498db' } },
+  { slug: 'bedroom-nightstand', name: 'Bedroom Nightstand', ip_address: '192.168.1.21', room: 'bedroom', groups: ['accent'], _demo: { brightness: 35, colour: '#e74c3c' } },
+  { slug: 'office-desk', name: 'Office Desk', ip_address: '192.168.1.30', room: 'office', groups: ['desk'], _demo: { brightness: 95, colour: '#5dade2' } },
+  { slug: 'office-shelf', name: 'Office Shelf', ip_address: '192.168.1.31', room: 'office', groups: ['accent'], _demo: { brightness: 55, colour: '#2ecc71' } },
 ];
 
 const DEMO_SCENES = ['all-off', 'movie-time', 'reading', 'party', 'focus', 'goodnight'];
@@ -959,11 +959,12 @@ function renderDevices() {
       <div class="room-label">${formatRoom(room)}</div>
       <div class="room-devices">
         ${devs.map(d => {
-          const bri = 70 + Math.floor(Math.random() * 30);
+          const bri = d._demo ? d._demo.brightness : (70 + Math.floor(Math.random() * 30));
+          const col = d._demo ? d._demo.colour : null;
           const idx = cardIndex++;
           return `
           <div class="device-card" data-slug="${d.slug}" style="animation-delay: ${idx * 0.06}s">
-            <div class="colour-strip"></div>
+            <div class="colour-strip${col ? ' active' : ''}" style="${col ? `background:${col};--strip-colour:${col}80` : ''}"></div>
             <div class="device-header">
               <div class="device-info">
                 <h3>${d.name}</h3>
