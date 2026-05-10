@@ -3,11 +3,18 @@
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import patch
 
 import pytest
 
-from smart_lights.models import CommandResult, DeviceConfig, DeviceDpsConfig
+try:
+    import fastapi  # noqa: F401
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed (install with .[api])")
+
+from smart_lights.models import DeviceConfig, DeviceDpsConfig
 
 
 @pytest.fixture
