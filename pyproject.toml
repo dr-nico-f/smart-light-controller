@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smart-light-controller"
-version = "1.0.0"
+version = "1.1.0"
 description = "Local-first CLI and library for controlling Tuya RGBCW smart bulbs over the LAN."
 readme = "README.md"
 license = "MIT"

@@ -18,7 +18,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(
     title="Smart Light Controller",
     description="Local-first HTTP API for controlling Tuya RGBCW smart bulbs.",
-    version="1.0.0",
+    version="1.1.0",
 )
 
 _service: SmartLightsService | None = None

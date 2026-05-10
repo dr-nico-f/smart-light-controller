@@ -28,6 +28,7 @@ What started as a quick script to toggle a desk lamp grew into a full service la
 - **Auto-discovery** — runs the TinyTuya wizard non-interactively to import new bulbs
 - **Refresh & fallback** — if a command fails due to a stale IP, the service rescans the LAN and retries
 - **Network diagnostics** — TCP probe, subnet comparison, VPN detection, SSID check, and human-friendly likely-cause hints
+- **Web dashboard** — glassmorphism dark-themed control panel with device cards, colour presets, scenes, transitions, and keyboard shortcuts ([live demo](https://dr-nico-f.github.io/smart-light-controller/))
 - **HTTP API** — full-featured FastAPI server for integration with Home Assistant, iOS Shortcuts, etc.
 - **Automation primitives** — trigger-to-scene rules ready for future menu-bar or webhook integrations
 - **Clean CLI** — every operation available as a `smart-lights` subcommand with JSON output
@@ -116,7 +117,14 @@ smart-lights status all
 smart-lights serve --port 8000
 ```
 
-Open `http://localhost:8000` for the **web control dashboard** — a dark-themed control panel with device cards, colour presets, scene buttons, brightness sliders, and transition controls.
+Open `http://localhost:8000` for the **web control dashboard** — a glassmorphism dark-themed control panel featuring:
+- Device cards grouped by room with on/off toggles and brightness sliders
+- 25 colour presets + custom colour picker with per-device targeting
+- Scene buttons with thematic colour feedback on device cards
+- Fade and breathe transition controls
+- Keyboard shortcuts (`1`–`9` toggle, `Esc` all-off, `F` fade, `B` breathe)
+
+Try the [**live demo**](https://dr-nico-f.github.io/smart-light-controller/) (runs in demo mode with mock data).
 
 Interactive API docs are at `http://localhost:8000/docs`. You can also use the API directly:
 
