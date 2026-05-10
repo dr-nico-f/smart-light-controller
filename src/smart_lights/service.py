@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ipaddress
+import logging
 from pathlib import Path
 from typing import Any, Callable
 
@@ -17,6 +18,8 @@ from smart_lights.tuya_client import (
     is_connectivity_error,
     is_success_response,
 )
+
+logger = logging.getLogger(__name__)
 
 
 DeviceOperation = Callable[[TuyaBulbController], dict[str, Any]]
@@ -113,12 +116,16 @@ class SmartLightsService:
     def refresh_discovery(self) -> dict[str, int]:
         """Refresh device metadata from local scan and optional cloud data."""
         updates = 0
+        logger.info("Starting device refresh via LAN scan")
         scanned = self.local_client.scan_devices()
+        logger.debug("LAN scan found %d devices", len(scanned))
         updates += len(self.registry.refresh_from_scan(scanned))
         if self.cloud_client.is_enabled:
+            logger.info("Fetching cloud device metadata")
             updates += len(self.registry.refresh_from_cloud(self.cloud_client.get_devices()))
         if updates:
             self.registry.save()
+            logger.info("Registry updated with %d device(s)", updates)
         return {"updated": updates, "scanned": len(scanned)}
 
     def discover_with_wizard(
@@ -242,8 +249,10 @@ class SmartLightsService:
             return CommandResult(target=device.slug, success=True, response=response, transport="local")
 
         if is_connectivity_error(response):
+            logger.warning("Connectivity error for %s (%s), refreshing metadata", device.slug, device.ip_address)
             self._refresh_device(device.device_id)
             refreshed_device = self.registry.get(device.device_id)
+            logger.info("Retrying %s at %s", device.slug, refreshed_device.ip_address)
             retry_response = operation(TuyaBulbController(refreshed_device, client=self.local_client))
             return CommandResult(
                 target=device.slug,
@@ -252,6 +261,7 @@ class SmartLightsService:
                 transport="local-refreshed",
             )
 
+        logger.debug("Command failed for %s: %s", device.slug, response)
         return CommandResult(target=device.slug, success=False, response=response, transport="local")
 
     def _for_target(self, target: str, operation: DeviceOperation) -> list[CommandResult]:
@@ -302,13 +312,10 @@ class SmartLightsService:
         for action in scene.actions:
             if action.power is not None:
                 results.extend(self.turn_on(action.target) if action.power else self.turn_off(action.target))
-            if action.mode is not None:
-                results.extend(self.set_mode(action.target, action.mode))
             if action.hsv is not None:
                 hue, saturation, value = action.hsv
                 results.extend(self.set_colour(action.target, hue, saturation, value))
-                continue
-            if action.mode == "white" or action.colourtemp is not None:
+            elif action.mode == "white" or action.colourtemp is not None:
                 results.extend(
                     self.set_white(
                         action.target,
@@ -316,7 +323,8 @@ class SmartLightsService:
                         colourtemp=action.colourtemp,
                     )
                 )
-                continue
-            if action.brightness is not None:
+            elif action.mode is not None:
+                results.extend(self.set_mode(action.target, action.mode))
+            elif action.brightness is not None:
                 results.extend(self.set_brightness(action.target, action.brightness))
         return results

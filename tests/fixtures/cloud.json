@@ -1,0 +1,6 @@
+{
+  "apiKey": "test-api-key",
+  "apiSecret": "test-api-secret",
+  "apiRegion": "us",
+  "apiDeviceID": "scan"
+}

@@ -1,0 +1,27 @@
+{
+  "devices": [
+    {
+      "slug": "living-room-top",
+      "name": "Living Room Top",
+      "device_id": "your-device-id-here",
+      "local_key": "your-local-key-here",
+      "ip_address": "192.168.1.10",
+      "version": "3.3",
+      "product_key": null,
+      "mac": null,
+      "category": "dj",
+      "room": "living-room",
+      "groups": ["ceiling"],
+      "dps": {
+        "switch": 20,
+        "mode": 21,
+        "brightness": 22,
+        "colourtemp": 23,
+        "colour": 24,
+        "scene": 25,
+        "timer": 26,
+        "music": 28
+      }
+    }
+  ]
+}

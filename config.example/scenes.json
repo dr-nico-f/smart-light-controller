@@ -1,0 +1,34 @@
+{
+  "scenes": [
+    {
+      "name": "all-off",
+      "description": "Turn everything off",
+      "actions": [
+        { "target": "all", "power": false }
+      ]
+    },
+    {
+      "name": "movie-time",
+      "description": "Dim warm lights for movie watching",
+      "actions": [
+        { "target": "living-room", "mode": "white", "brightness": 20, "colourtemp": 10 }
+      ]
+    },
+    {
+      "name": "reading",
+      "description": "Bright cool white for reading",
+      "actions": [
+        { "target": "living-room", "mode": "white", "brightness": 100, "colourtemp": 80 }
+      ]
+    },
+    {
+      "name": "party",
+      "description": "Colourful party mode",
+      "actions": [
+        { "target": "living-room-top", "mode": "colour", "hsv": [0, 1000, 1000] },
+        { "target": "living-room-bottom", "mode": "colour", "hsv": [120, 1000, 1000] },
+        { "target": "living-room-lamp", "mode": "colour", "hsv": [240, 1000, 1000] }
+      ]
+    }
+  ]
+}

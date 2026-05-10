@@ -1,0 +1,6 @@
+{
+  "apiKey": "your-tuya-iot-api-key",
+  "apiSecret": "your-tuya-iot-api-secret",
+  "apiRegion": "us",
+  "apiDeviceID": "scan"
+}

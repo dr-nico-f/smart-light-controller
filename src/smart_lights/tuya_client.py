@@ -5,6 +5,7 @@ from __future__ import annotations
 import colorsys
 import importlib
 import json
+import logging
 from pathlib import Path
 import socket
 import subprocess
@@ -14,6 +15,8 @@ import tinytuya
 from tinytuya import wizard as tinytuya_wizard
 
 from smart_lights.models import CloudConfig, DeviceConfig
+
+logger = logging.getLogger(__name__)
 
 
 CONNECTIVITY_ERROR_CODES = {"901", "902", "903", "904"}
@@ -30,7 +33,7 @@ def response_error_code(response: dict[str, Any] | None) -> str | None:
 
 def is_success_response(response: dict[str, Any] | None) -> bool:
     """Return True when a TinyTuya response does not report an error."""
-    return bool(response) and "Err" not in response
+    return response is not None and "Err" not in response
 
 
 def is_connectivity_error(response: dict[str, Any] | None) -> bool:
@@ -178,6 +181,7 @@ class LocalTuyaClient:
 
     def scan_devices(self, max_seconds: int = 5) -> list[dict[str, Any]]:
         """Scan the LAN for Tuya devices and normalize the results."""
+        logger.debug("Starting LAN device scan (max %ds)", max_seconds)
         try:
             scanned = tinytuya.deviceScan(
                 verbose=False,
@@ -187,6 +191,7 @@ class LocalTuyaClient:
                 forcescan=True,
             )
         except Exception:
+            logger.exception("LAN device scan failed")
             return []
         results: list[dict[str, Any]] = []
         for ip_address, payload in scanned.items():
@@ -343,6 +348,7 @@ class CloudTuyaClient:
         try:
             result = self._get_client().getdevices()
         except Exception:
+            logger.exception("Cloud device fetch failed")
             return []
         if isinstance(result, dict) and "result" in result:
             return result["result"]

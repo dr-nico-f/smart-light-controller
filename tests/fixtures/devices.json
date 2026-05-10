@@ -1,0 +1,73 @@
+{
+  "devices": [
+    {
+      "slug": "living-room-top",
+      "name": "Living Room Top",
+      "device_id": "dev001",
+      "local_key": "key-top-0000001",
+      "ip_address": "192.168.1.10",
+      "version": "3.3",
+      "product_key": "pk001",
+      "mac": "AA:BB:CC:DD:EE:01",
+      "category": "dj",
+      "room": "living-room",
+      "groups": ["ceiling"],
+      "dps": {
+        "switch": 20,
+        "mode": 21,
+        "brightness": 22,
+        "colourtemp": 23,
+        "colour": 24,
+        "scene": 25,
+        "timer": 26,
+        "music": 28
+      }
+    },
+    {
+      "slug": "living-room-bottom",
+      "name": "Living Room Bottom",
+      "device_id": "dev002",
+      "local_key": "key-bot-0000002",
+      "ip_address": "192.168.1.11",
+      "version": "3.3",
+      "product_key": "pk001",
+      "mac": "AA:BB:CC:DD:EE:02",
+      "category": "dj",
+      "room": "living-room",
+      "groups": ["ceiling"],
+      "dps": {
+        "switch": 20,
+        "mode": 21,
+        "brightness": 22,
+        "colourtemp": 23,
+        "colour": 24,
+        "scene": 25,
+        "timer": 26,
+        "music": 28
+      }
+    },
+    {
+      "slug": "living-room-lamp",
+      "name": "Living Room Lamp",
+      "device_id": "dev003",
+      "local_key": "key-lamp-000003",
+      "ip_address": "192.168.1.12",
+      "version": "3.3",
+      "product_key": "pk002",
+      "mac": "AA:BB:CC:DD:EE:03",
+      "category": "dj",
+      "room": "living-room",
+      "groups": ["floor"],
+      "dps": {
+        "switch": 20,
+        "mode": 21,
+        "brightness": 22,
+        "colourtemp": 23,
+        "colour": 24,
+        "scene": 25,
+        "timer": 26,
+        "music": 28
+      }
+    }
+  ]
+}

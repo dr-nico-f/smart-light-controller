@@ -1,0 +1,10 @@
+{
+  "automations": [
+    {
+      "name": "sunset-relax",
+      "description": "Dim warm lights at sunset",
+      "trigger": { "kind": "time", "value": "sunset" },
+      "scene": "movie-time"
+    }
+  ]
+}

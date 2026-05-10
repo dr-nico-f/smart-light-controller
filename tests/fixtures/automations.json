@@ -1,0 +1,10 @@
+{
+  "automations": [
+    {
+      "name": "sunset-movie",
+      "description": "Apply movie-time at sunset",
+      "trigger": { "kind": "time", "value": "sunset" },
+      "scene": "movie-time"
+    }
+  ]
+}
