@@ -8,6 +8,10 @@ CLI, Python library, and HTTP API for controlling Tuya-based RGBCW smart bulbs d
 
 Built with **Python 3.11+** and **TinyTuya**.
 
+<p align="center">
+  <img src="docs/dashboard.png" alt="Web Dashboard" width="800">
+</p>
+
 ---
 
 ## 💡 Motivation
